@@ -1,0 +1,39 @@
+services:
+  findmy-ring:
+    user: "1000:100" #customize  for your environment
+    build: .
+    container_name: findmy-ring
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Apple ID credentials (no app password)
+      - ICLOUD_USERNAME=#username
+      - ICLOUD_PASSWORD=#password
+
+
+      # Simple API auth (choose a long random string)
+      - API_TOKEN=change-me-to-a-long-random-token
+
+      # Map friendly endpoint names → exact Find My device names
+      # You can find the exact device names via /devices endpoint after auth
+      - 'DEVICE_MAP_JSON={
+  "phone_1":"device_id",
+  "phone_2":"device_id",
+  "ipad":"device_id",
+  etc
+}'
+
+      # Cooldown to prevent spam (seconds)
+      - COOLDOWN_SECONDS=20
+
+      # Persist pyicloud session here (critical to avoid repeated login alerts)
+      - PYICLOUD_DIR=/data/pyicloud
+    volumes:
+      - ./data:/data
+
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
